@@ -15,7 +15,7 @@ export function SettingsFeatureSection({ settings, onChange }: SettingsFeatureSe
         <label className="flex items-center justify-between cursor-pointer group">
           <div className="space-y-0.5">
             <span className="text-sm font-medium text-foreground/90">三段式思考流程</span>
-            <p className="text-[11px] text-muted-foreground">AI 将进行"思考 → 质疑 → 打磨"的深度推理</p>
+            <p className="text-[11px] text-muted-foreground">AI 将进行&quot;思考 → 质疑 → 打磨&quot;的深度推理</p>
           </div>
           <div
             className={`w-11 h-6 rounded-full transition-colors relative duration-200 ${

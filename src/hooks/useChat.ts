@@ -84,7 +84,17 @@ export function useChat() {
         setStreamingContent("");
       }
     },
-    [settings, conversation, currentConversationId]
+    [
+      settings,
+      conversation,
+      currentConversationId,
+      setStreaming,
+      setCurrentPhase,
+      setStreamingContent,
+      addMessage,
+      updateMessage,
+      createConversation,
+    ]
   );
 
   const runThreePhaseChat = async (

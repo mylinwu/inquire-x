@@ -1,8 +1,7 @@
 "use client";
 
 import type { Message } from "@/types";
-import { MarkdownRenderer, ThinkingIndicator, StreamingCursor } from "./MarkdownRenderer";
-import { User, Sparkles } from "lucide-react";
+import { MarkdownRenderer, ThinkingIndicator } from "./MarkdownRenderer";
 
 interface ChatMessageProps {
   message: Message;

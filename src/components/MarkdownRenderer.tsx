@@ -16,7 +16,7 @@ export function MarkdownRenderer({ content, isStreaming = false }: MarkdownRende
   const [highlightedHtml, setHighlightedHtml] = useState<string>("");
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { html, isIncomplete } = useMemo(() => {
+  const { html } = useMemo(() => {
     return renderStreamingMarkdown(content, settings.markdownSafetyLevel);
   }, [content, settings.markdownSafetyLevel]);
 
@@ -27,7 +27,6 @@ export function MarkdownRenderer({ content, isStreaming = false }: MarkdownRende
       if (!containerRef.current) return;
 
       const codeBlocks = containerRef.current.querySelectorAll("pre code");
-      const processedHtml = html;
 
       // 简单情况：没有代码块，直接使用
       if (codeBlocks.length === 0) {

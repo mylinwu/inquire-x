@@ -1,6 +1,6 @@
 "use client";
 
-import { Sparkles, ArrowRight } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { useSettings } from "@/store";
 
 interface RecommendedQuestionsProps {

@@ -36,7 +36,7 @@ export function SettingsModelSection({ settings, onChange }: SettingsModelSectio
     if (settings.apiKey) {
       fetchModels();
     }
-  }, [settings.apiKey]);
+  }, [settings.apiKey, fetchModels]);
 
   const filteredModels = models.filter(
     (m) =>

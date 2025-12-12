@@ -43,7 +43,7 @@ function validateInput(body: unknown): ChatRequest {
     throw new Error("系统提示词无效");
   }
 
-  if (!VALID_PHASES.includes(req.phase as any)) {
+  if (!VALID_PHASES.includes(req.phase as ChatRequest["phase"])) {
     throw new Error("阶段参数无效");
   }
 

@@ -16,7 +16,6 @@ export default function Home() {
     isSettingsOpen,
     setMenuOpen,
     setSettingsOpen,
-    createConversation,
     setCurrentConversation,
   } = useAppStore();
 
