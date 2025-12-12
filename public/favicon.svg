@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <!-- 背景 -->
+  <rect width="192" height="192" fill="#07c160" rx="40"/>
+  
+  <!-- 问号主体 -->
+  <g fill="none" stroke="white" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+    <!-- 问号的圆点部分 -->
+    <circle cx="96" cy="144" r="10"/>
+    
+    <!-- 问号的弧形部分 -->
+    <path d="M 96 32 Q 96 32 110 40 Q 130 52 130 72 Q 130 92 110 102 Q 96 110 96 120"/>
+  </g>
+  
+  <!-- 装饰性的思考气泡 -->
+  <g fill="white" opacity="0.3">
+    <circle cx="156" cy="48" r="12"/>
+    <circle cx="168" cy="60" r="8"/>
+  </g>
+</svg>

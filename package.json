@@ -2,26 +2,40 @@
   "name": "inquire-x",
   "version": "0.1.0",
   "private": true,
+  "author": "linwu <worklinwu@gmail.com>",
+  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "next lint"
   },
   "dependencies": {
-    "next": "16.0.10",
-    "react": "19.2.1",
-    "react-dom": "19.2.1"
+    "@ai-sdk/react": "^1.0.0",
+    "@openrouter/ai-sdk-provider": "^0.4.0",
+    "ai": "^4.0.0",
+    "katex": "^0.16.9",
+    "lucide-react": "^0.468.0",
+    "markdown-it": "^14.1.0",
+    "markdown-it-task-lists": "^2.1.1",
+    "next": "15.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "shiki": "^1.24.0",
+    "zustand": "^5.0.2"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/typography": "^0.5.15",
+    "@types/katex": "^0.16.7",
+    "@types/markdown-it": "^14.1.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "babel-plugin-react-compiler": "1.0.0",
+    "autoprefixer": "^10.4.20",
     "eslint": "^9",
-    "eslint-config-next": "16.0.10",
-    "tailwindcss": "^4",
+    "eslint-config-next": "15.1.0",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
     "typescript": "^5"
   },
   "packageManager": "pnpm@10.18.2+sha512.9fb969fa749b3ade6035e0f109f0b8a60b5d08a1a87fdf72e337da90dcc93336e2280ca4e44f2358a649b83c17959e9993e777c2080879f3801e6f0d999ad3dd"

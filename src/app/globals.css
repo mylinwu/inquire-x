@@ -1,26 +1,192 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    /* 基础色板 - WEUI/Modern 风格 (HSL) */
+    --background: 0 0% 93%; /* #ededed */
+    --foreground: 0 0% 7%; /* #111111 */
+
+    /* 品牌色 - 微信绿 */
+    --primary: 149 93% 39%; /* #07c160 */
+    --primary-foreground: 0 0% 100%; /* #ffffff */
+
+    /* 辅助色 */
+    --secondary: 0 0% 97%; /* #f7f7f7 */
+    --secondary-foreground: 0 0% 7%; /* #111111 */
+
+    --muted: 0 0% 97%; /* #f7f7f7 */
+    --muted-foreground: 0 0% 46%; /* #767676 */
+
+    --accent: 0 0% 90%; /* #e5e5e5 */
+    --accent-foreground: 0 0% 7%; /* #111111 */
+
+    /* 卡片/容器 */
+    --card: 0 0% 100%; /* #ffffff */
+    --card-foreground: 0 0% 7%; /* #111111 */
+
+    /* 表单元素 */
+    --border: 0 0% 86%; /* #dcdcdc */
+    --input: 0 0% 100%; /* #ffffff */
+    --ring: 149 93% 39%; /* #07c160 */
+
+    /* 消息气泡特化 */
+    --bubble-user: 100 77% 67%; /* #95ec69 */
+    --bubble-user-text: 0 0% 0%; /* #000000 */
+    --bubble-ai: 0 0% 100%; /* #ffffff */
+    --bubble-ai-text: 0 0% 7%; /* #111111 */
+
+    --radius: 0.75rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background: 0 0% 7%; /* #111111 */
+      --foreground: 0 0% 94%; /* #f0f0f0 */
+
+      --primary: 149 93% 39%; /* #07c160 */
+      --primary-foreground: 0 0% 100%; /* #ffffff */
+
+      --secondary: 0 0% 12%; /* #1e1e1e */
+      --secondary-foreground: 0 0% 94%; /* #f0f0f0 */
+
+      --muted: 0 0% 12%; /* #1e1e1e */
+      --muted-foreground: 0 0% 53%; /* #888888 */
+
+      --accent: 0 0% 17%; /* #2c2c2c */
+      --accent-foreground: 0 0% 94%; /* #f0f0f0 */
+
+      --card: 0 0% 10%; /* #191919 */
+      --card-foreground: 0 0% 94%; /* #f0f0f0 */
+
+      --border: 0 0% 17%; /* #2c2c2c */
+      --input: 0 0% 12%; /* #1e1e1e */
+      --ring: 149 93% 39%; /* #07c160 */
+
+      --bubble-user: 149 93% 39%; /* #07c160 */
+      --bubble-user-text: 0 0% 100%; /* #ffffff */
+      --bubble-ai: 0 0% 17%; /* #2c2c2c */
+      --bubble-ai-text: 0 0% 94%; /* #f0f0f0 */
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+
+/* Markdown 样式优化 */
+.markdown-content {
+  @apply text-[15px] leading-relaxed break-words;
+}
+
+.markdown-content > *:first-child {
+  margin-top: 0;
+}
+
+.markdown-content > *:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3 {
+  @apply font-semibold mt-6 mb-3;
+}
+
+.markdown-content h1 { @apply text-xl; }
+.markdown-content h2 { @apply text-lg; }
+.markdown-content h3 { @apply text-base; }
+
+.markdown-content p {
+  @apply mb-3;
+}
+
+.markdown-content ul {
+  @apply list-disc pl-5 mb-3;
+}
+
+.markdown-content ol {
+  @apply list-decimal pl-5 mb-3;
+}
+
+.markdown-content li {
+  @apply mb-1 pl-1;
+}
+
+.markdown-content code {
+  @apply px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10 font-mono text-[0.9em];
+}
+
+.markdown-content pre {
+  @apply my-3 p-3 rounded-lg bg-[#f6f8fa] dark:bg-[#161b22] overflow-x-auto border border-black/5 dark:border-white/5;
+}
+
+.markdown-content pre code {
+  @apply bg-transparent p-0 text-sm;
+}
+
+.markdown-content blockquote {
+  @apply pl-4 border-l-4 border-primary/50 text-muted-foreground my-3 italic;
+}
+
+.markdown-content a {
+  @apply text-[#576b95] dark:text-[#7d90a9] no-underline hover:underline;
+}
+
+.markdown-content table {
+  @apply w-full border-collapse my-3 text-sm;
+}
+
+.markdown-content th,
+.markdown-content td {
+  @apply border border-border px-3 py-2 text-left;
+}
+
+.markdown-content th {
+  @apply bg-muted font-semibold;
+}
+
+/* KaTeX 调整 */
+.katex-display {
+  @apply my-3 overflow-x-auto py-2;
+}
+
+/* 滚动条优化 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-black/10 dark:bg-white/10 rounded-full hover:bg-black/20 dark:hover:bg-white/20;
+}
+
+/* 流式光标 */
+.streaming-cursor {
+  @apply inline-block w-[2px] h-[1.2em] bg-primary align-text-bottom ml-[2px] animate-[blink_1s_step-end_infinite];
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* 移动端安全区域适配 */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
 }
