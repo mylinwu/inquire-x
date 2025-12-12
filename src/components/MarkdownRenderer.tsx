@@ -11,7 +11,7 @@ interface MarkdownRendererProps {
   isStreaming?: boolean;
 }
 
-export function MarkdownRenderer({ content, isStreaming = false }: MarkdownRendererProps) {
+export function MarkdownRenderer({ content, isStreaming: _isStreaming = false }: MarkdownRendererProps) {
   const settings = useSettings();
   const [highlightedHtml, setHighlightedHtml] = useState<string>("");
   const containerRef = useRef<HTMLDivElement>(null);

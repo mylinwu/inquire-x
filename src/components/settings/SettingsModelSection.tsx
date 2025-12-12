@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Search, Check, ChevronDown, RefreshCw } from "lucide-react";
 import type { Settings, OpenRouterModel } from "@/types";
 
@@ -15,22 +15,22 @@ export function SettingsModelSection({ settings, onChange }: SettingsModelSectio
   const [isModelDropdownOpen, setIsModelDropdownOpen] = useState(false);
   const [isLoadingModels, setIsLoadingModels] = useState(false);
 
-  const fetchModels = async () => {
-    if (!settings.apiKey) return;
-    
+  const fetchModels = useCallback(async () => {
     setIsLoadingModels(true);
     try {
-      const res = await fetch(`/api/models?apiKey=${encodeURIComponent(settings.apiKey)}`);
-      if (res.ok) {
-        const data = await res.json();
-        setModels(data.models || []);
+      const response = await fetch(
+        `/api/models?apiKey=${encodeURIComponent(settings.apiKey)}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setModels(data.models);
       }
-    } catch {
+    } catch (error) {
       console.error("获取模型列表失败");
     } finally {
       setIsLoadingModels(false);
     }
-  };
+  }, [settings.apiKey]);
 
   useEffect(() => {
     if (settings.apiKey) {
