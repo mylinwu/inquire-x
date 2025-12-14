@@ -8,7 +8,8 @@ export interface Message {
 }
 
 export type ThinkingPhase = 
-  | "thinking"      // 思考中
+  | "drafting"      // 写草稿中 (三段式第一步)
+  | "thinking"      // 思考中 (思考模型)
   | "questioning"   // 自我质疑中
   | "polishing"     // 打磨中
   | "complete";     // 完成
@@ -29,8 +30,10 @@ export interface Settings {
   followUpPrompt: string;
   recommendedQuestions: string[];
   enableThreePhase: boolean;
+  enableAIGeneratedQuestions: boolean;
   streamSpeed: "slow" | "medium" | "fast";
   markdownSafetyLevel: "strict" | "normal" | "loose";
+  temperature: number;
 }
 
 export interface OpenRouterModel {

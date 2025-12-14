@@ -140,6 +140,10 @@
   @apply pl-4 border-l-4 border-primary/50 text-muted-foreground my-3 italic;
 }
 
+.markdown-content hr {
+  @apply my-6 border-t border-black/10 dark:border-white/10;
+}
+
 .markdown-content a {
   @apply text-[#576b95] dark:text-[#7d90a9] no-underline hover:underline;
 }

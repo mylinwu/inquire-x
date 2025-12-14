@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useAppStore, useCurrentConversation } from "@/store";
+import { PHASE_USER_MESSAGES } from "@/config";
 import type { ThinkingPhase } from "@/types";
 
 export function useChat() {
@@ -15,6 +16,7 @@ export function useChat() {
     setStreamingContent,
     addMessage,
     updateMessage,
+    deleteMessage,
     createConversation,
     currentConversationId,
   } = useAppStore();
@@ -50,10 +52,11 @@ export function useChat() {
 
       // 添加 AI 消息占位
       const aiMessageId = `msg_${Date.now()}_ai`;
+      const initialPhase = settings.enableThreePhase ? "drafting" : "polishing";
       addMessage(convId, {
         role: "assistant",
         content: "",
-        thinkingPhase: "thinking",
+        thinkingPhase: initialPhase,
       });
 
       // 获取刚添加的消息 ID
@@ -102,7 +105,7 @@ export function useChat() {
     messageId: string,
     messages: { role: "user" | "assistant"; content: string }[]
   ) => {
-    const phases: ThinkingPhase[] = ["thinking", "questioning", "polishing"];
+    const phases: ThinkingPhase[] = ["drafting", "questioning", "polishing"];
     let accumulatedContent = "";
     let finalContent = "";
 
@@ -111,17 +114,14 @@ export function useChat() {
       updateMessage(convId, messageId, { thinkingPhase: phase });
 
       const phaseMessages =
-        phase === "thinking"
+        phase === "drafting"
           ? messages
           : [
               ...messages,
               { role: "assistant" as const, content: accumulatedContent },
               {
                 role: "user" as const,
-                content:
-                  phase === "questioning"
-                    ? "请审视你的回答，找出不足之处"
-                    : "请基于反思给出最终答复",
+                content: PHASE_USER_MESSAGES[phase as keyof typeof PHASE_USER_MESSAGES],
               },
             ];
 
@@ -135,6 +135,7 @@ export function useChat() {
           systemPrompt: settings.systemPrompt,
           phase,
           username: settings.username,
+          temperature: settings.temperature,
         }),
       });
 
@@ -169,6 +170,10 @@ export function useChat() {
             } catch {
               // 忽略解析错误
             }
+          } else if (line.startsWith("g:")) {
+            // 思考模型的 reasoning 数据，显示"思考中"状态
+            setCurrentPhase("thinking");
+            updateMessage(convId, messageId, { thinkingPhase: "thinking" });
           }
         }
       }
@@ -199,6 +204,7 @@ export function useChat() {
         systemPrompt: settings.systemPrompt,
         phase: "polishing",
         username: settings.username,
+        temperature: settings.temperature,
       }),
     });
 
@@ -219,9 +225,23 @@ export function useChat() {
       const chunk = decoder.decode(value, { stream: true });
       const lines = chunk.split("\n");
 
+      let isReasoning = false;
       for (const line of lines) {
-        if (line.startsWith("0:")) {
+        if (line.startsWith("g:")) {
+          // 思考模型的 reasoning 数据，显示"思考中"状态
+          if (!isReasoning) {
+            isReasoning = true;
+            setCurrentPhase("thinking");
+            updateMessage(convId, messageId, { thinkingPhase: "thinking" });
+          }
+        } else if (line.startsWith("0:")) {
           try {
+            // 当开始输出文本时，切换到 polishing 状态
+            if (isReasoning) {
+              isReasoning = false;
+              setCurrentPhase("polishing");
+              updateMessage(convId, messageId, { thinkingPhase: "polishing" });
+            }
             const text = JSON.parse(line.slice(2));
             content += text;
             setStreamingContent(content);
@@ -271,8 +291,90 @@ export function useChat() {
     }
   };
 
+  const regenerateMessage = useCallback(
+    async (messageId: string) => {
+      if (!settings.apiKey || !currentConversationId) {
+        setError("请先在设置中配置 API Key");
+        return;
+      }
+
+      const conv = useAppStore.getState().conversations.find((c) => c.id === currentConversationId);
+      if (!conv) return;
+
+      // 找到要重新生成的消息的索引
+      const messageIndex = conv.messages.findIndex((m) => m.id === messageId);
+      if (messageIndex === -1) return;
+
+      // 找到这条 AI 消息之前的用户消息
+      let userMessageIndex = messageIndex - 1;
+      while (userMessageIndex >= 0 && conv.messages[userMessageIndex].role !== "user") {
+        userMessageIndex--;
+      }
+      if (userMessageIndex < 0) return;
+
+      const userMessage = conv.messages[userMessageIndex];
+
+      // 删除当前 AI 消息
+      deleteMessage(currentConversationId, messageId);
+
+      setError(null);
+      setStreaming(true);
+
+      // 构建消息历史（不包含被删除的消息）
+      const messages = conv.messages
+        .slice(0, messageIndex)
+        .map((m) => ({
+          role: m.role,
+          content: m.content,
+        }));
+
+      // 添加新的 AI 消息占位
+      const initialPhase = settings.enableThreePhase ? "drafting" : "polishing";
+      addMessage(currentConversationId, {
+        role: "assistant",
+        content: "",
+        thinkingPhase: initialPhase,
+      });
+
+      // 获取新消息 ID
+      const updatedConv = useAppStore.getState().conversations.find((c) => c.id === currentConversationId);
+      const newMessage = updatedConv?.messages[updatedConv.messages.length - 1];
+      const newMessageId = newMessage?.id || `msg_${Date.now()}_ai`;
+
+      try {
+        if (settings.enableThreePhase) {
+          await runThreePhaseChat(currentConversationId, newMessageId, messages);
+        } else {
+          await runSingleChat(currentConversationId, newMessageId, messages);
+        }
+        await generateFollowUp(currentConversationId, newMessageId);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "请求失败");
+        updateMessage(currentConversationId, newMessageId, {
+          content: "抱歉，请求失败。请检查网络和 API Key 设置。",
+          thinkingPhase: "complete",
+        });
+      } finally {
+        setStreaming(false);
+        setCurrentPhase(null);
+        setStreamingContent("");
+      }
+    },
+    [
+      settings,
+      currentConversationId,
+      setStreaming,
+      setCurrentPhase,
+      setStreamingContent,
+      addMessage,
+      updateMessage,
+      deleteMessage,
+    ]
+  );
+
   return {
     sendMessage,
+    regenerateMessage,
     isStreaming,
     currentPhase,
     streamingContent,

@@ -1,5 +1,6 @@
 "use client";
 
+import { RefreshCw } from "lucide-react";
 import type { Message } from "@/types";
 import { MarkdownRenderer, ThinkingIndicator } from "./MarkdownRenderer";
 
@@ -7,11 +8,13 @@ interface ChatMessageProps {
   message: Message;
   isStreaming?: boolean;
   onFollowUpClick?: (question: string) => void;
+  onRegenerate?: (messageId: string) => void;
 }
 
-export function ChatMessage({ message, isStreaming, onFollowUpClick }: ChatMessageProps) {
+export function ChatMessage({ message, isStreaming, onFollowUpClick, onRegenerate }: ChatMessageProps) {
   const isUser = message.role === "user";
   const showThinking = !isUser && message.thinkingPhase && message.thinkingPhase !== "complete";
+  const showRegenerate = !isUser && message.thinkingPhase === "complete" && !isStreaming;
 
   return (
     <div className={`flex w-full mb-6 ${isUser ? "justify-end" : "justify-start"}`}>
@@ -38,6 +41,18 @@ export function ChatMessage({ message, isStreaming, onFollowUpClick }: ChatMessa
               </>
             )}
           </div>
+
+          {/* 重新生成按钮 */}
+          {showRegenerate && (
+            <button
+              onClick={() => onRegenerate?.(message.id)}
+              className="mt-2 ml-1 flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors"
+              title="重新生成"
+            >
+              <RefreshCw size={12} />
+              <span>重新生成</span>
+            </button>
+          )}
 
           {/* 追问问题 */}
           {!isUser &&

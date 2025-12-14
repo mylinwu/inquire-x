@@ -20,7 +20,7 @@ export default function Home() {
   } = useAppStore();
 
   const conversation = useCurrentConversation();
-  const { sendMessage, isStreaming, error } = useChat();
+  const { sendMessage, regenerateMessage, isStreaming, error } = useChat();
 
   const handleNewChat = useCallback(() => {
     setCurrentConversation(null);
@@ -47,6 +47,13 @@ export default function Home() {
     [sendMessage]
   );
 
+  const handleRegenerate = useCallback(
+    async (messageId: string) => {
+      await regenerateMessage(messageId);
+    },
+    [regenerateMessage]
+  );
+
   const handleOpenSettings = useCallback(() => {
     setMenuOpen(false);
     setSettingsOpen(true);
@@ -69,6 +76,7 @@ export default function Home() {
             messages={conversation.messages}
             isStreaming={isStreaming}
             onFollowUpClick={handleFollowUpClick}
+            onRegenerate={handleRegenerate}
           />
         )}
 

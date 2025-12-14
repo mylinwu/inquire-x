@@ -1,5 +1,10 @@
-import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { generateText } from "ai";
+import { buildFollowUpContextPrompt } from "@/config";
+import {
+  createOpenRouterClient,
+  createErrorResponse,
+  createJsonResponse,
+} from "@/lib/api-utils";
 
 export const runtime = "edge";
 
@@ -16,20 +21,15 @@ export async function POST(req: Request) {
     const { context, apiKey, model, followUpPrompt } = body;
 
     if (!apiKey || !context || !model) {
-      return new Response(JSON.stringify({ error: "缺少必需参数" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
+      return createErrorResponse("缺少必需参数");
     }
 
-    const openrouter = createOpenRouter({
-      apiKey,
-    });
+    const openrouter = createOpenRouterClient(apiKey);
 
     const result = await generateText({
       model: openrouter(model),
       system: followUpPrompt,
-      prompt: `以下是对话内容：\n\n${context}\n\n请基于此生成三个追问问题。`,
+      prompt: buildFollowUpContextPrompt(context),
     });
 
     const questions = result.text
@@ -38,17 +38,9 @@ export async function POST(req: Request) {
       .filter((q) => q.length > 0)
       .slice(0, 3);
 
-    return new Response(JSON.stringify({ questions }), {
-      headers: { "Content-Type": "application/json" },
-    });
+    return createJsonResponse({ questions });
   } catch (error) {
     console.error("Follow-up API Error:", error);
-    return new Response(
-      JSON.stringify({ error: "生成追问失败" }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    return createErrorResponse("生成追问失败", 500);
   }
 }

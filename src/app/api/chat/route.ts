@@ -1,5 +1,12 @@
-import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { streamText } from "ai";
+import { PHASE_PROMPTS, VALID_PHASES, DEFAULT_TEMPERATURE } from "@/config";
+import {
+  createOpenRouterClient,
+  formatCurrentTime,
+  createErrorResponse,
+  validateApiKey,
+  validateModel,
+} from "@/lib/api-utils";
 
 export const runtime = "edge";
 
@@ -8,17 +15,10 @@ interface ChatRequest {
   apiKey: string;
   model: string;
   systemPrompt: string;
-  phase: "thinking" | "questioning" | "polishing";
+  phase: "drafting" | "questioning" | "polishing";
   username?: string;
+  temperature?: number;
 }
-
-const PHASE_PROMPTS = {
-  thinking: `请直接回答用户的问题。给出你的初步思考和回答。`,
-  questioning: `请审视你刚才的回答，找出其中可能不够严谨、片面或有遗漏的地方。指出2-3个值得反思的点。`,
-  polishing: `基于之前的回答和反思，现在给出最终优化后的答复。整合之前的思考，给出更完善、更有深度的回答。使用 Markdown 格式化输出。`,
-};
-
-const VALID_PHASES = ["thinking", "questioning", "polishing"] as const;
 
 function validateInput(body: unknown): ChatRequest {
   if (!body || typeof body !== "object") {
@@ -31,13 +31,8 @@ function validateInput(body: unknown): ChatRequest {
     throw new Error("messages 必须是数组");
   }
 
-  if (typeof req.apiKey !== "string" || req.apiKey.trim().length === 0) {
-    throw new Error("API Key 未设置");
-  }
-
-  if (typeof req.model !== "string" || req.model.trim().length === 0) {
-    throw new Error("模型未设置");
-  }
+  const apiKey = validateApiKey(req.apiKey);
+  const model = validateModel(req.model);
 
   if (typeof req.systemPrompt !== "string") {
     throw new Error("系统提示词无效");
@@ -49,45 +44,50 @@ function validateInput(body: unknown): ChatRequest {
 
   return {
     messages: req.messages,
-    apiKey: req.apiKey,
-    model: req.model,
+    apiKey,
+    model,
     systemPrompt: req.systemPrompt,
     phase: req.phase as ChatRequest["phase"],
     username: typeof req.username === "string" ? req.username : undefined,
+    temperature: typeof req.temperature === "number" ? req.temperature : DEFAULT_TEMPERATURE,
   };
 }
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { messages, apiKey, model, systemPrompt, phase, username } = validateInput(body);
+    const { messages, apiKey, model, systemPrompt, phase, username, temperature } = validateInput(body);
 
-    const openrouter = createOpenRouter({
-      apiKey,
-    });
+    const openrouter = createOpenRouterClient(apiKey);
 
+    // 构建系统提示词
     let finalSystemPrompt = systemPrompt;
+    
+    // 添加用户称呼
     if (username) {
       finalSystemPrompt = finalSystemPrompt.replace(/{username}/g, username);
+      finalSystemPrompt = `你可以称呼我为“${username}”。\n\n${finalSystemPrompt}`;
     }
+    
+    // 添加当前时间
+    const currentTime = formatCurrentTime();
+    finalSystemPrompt = `当前时间：${currentTime}\n\n${finalSystemPrompt}`;
+    
     finalSystemPrompt += `\n\n${PHASE_PROMPTS[phase]}`;
 
     const result = streamText({
       model: openrouter(model),
       system: finalSystemPrompt,
       messages,
+      temperature,
     });
 
-    return result.toDataStreamResponse();
+    return result.toDataStreamResponse({
+      sendReasoning: true,
+    });
   } catch (error) {
     console.error("Chat API Error:", error);
     const message = error instanceof Error ? error.message : "请求失败";
-    return new Response(
-      JSON.stringify({ error: message }),
-      {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    return createErrorResponse(message);
   }
 }
