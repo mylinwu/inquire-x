@@ -15,7 +15,8 @@ const createMarkdownRenderer = (safetyLevel: "strict" | "normal" | "loose" = "no
   md.use(taskLists, { enabled: true });
 
   // 添加 KaTeX 数学公式支持
-  const mathInlineRule = (state: Record<string, any>, silent: boolean) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mathInlineRule = (state: any, silent: boolean) => {
     const start = state.pos;
     const marker = state.src.charAt(start);
 
@@ -34,7 +35,8 @@ const createMarkdownRenderer = (safetyLevel: "strict" | "normal" | "loose" = "no
     return true;
   };
 
-  const mathBlockRule = (state: Record<string, any>, startLine: number, endLine: number, silent: boolean) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mathBlockRule = (state: any, startLine: number, endLine: number, silent: boolean) => {
     const startPos = state.bMarks[startLine] + state.tShift[startLine];
     const maxPos = state.eMarks[startLine];
 
@@ -76,7 +78,8 @@ const createMarkdownRenderer = (safetyLevel: "strict" | "normal" | "loose" = "no
   md.inline.ruler.after("escape", "math_inline", mathInlineRule);
   md.block.ruler.after("fence", "math_block", mathBlockRule);
 
-  md.renderer.rules.math_inline = (tokens: Array<Record<string, any>>, idx: number) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  md.renderer.rules.math_inline = (tokens: any[], idx: number) => {
     try {
       return katex.renderToString(tokens[idx].content, {
         throwOnError: false,
@@ -87,7 +90,8 @@ const createMarkdownRenderer = (safetyLevel: "strict" | "normal" | "loose" = "no
     }
   };
 
-  md.renderer.rules.math_block = (tokens: Array<Record<string, any>>, idx: number) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  md.renderer.rules.math_block = (tokens: any[], idx: number) => {
     try {
       return `<div class="katex-display">${katex.renderToString(tokens[idx].content, {
         throwOnError: false,

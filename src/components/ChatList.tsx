@@ -37,7 +37,7 @@ export function ChatList({ messages, isStreaming, onFollowUpClick }: ChatListPro
       className="flex-1 overflow-y-auto px-4 py-6 scroll-smooth"
       onScroll={handleScroll}
     >
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="mx-auto space-y-6">
         {messages.map((message, index) => (
           <ChatMessage
             key={message.id}

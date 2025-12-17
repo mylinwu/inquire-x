@@ -24,7 +24,7 @@ export function RecommendedQuestions({ onSelect }: RecommendedQuestionsProps) {
           </p>
         </div>
 
-        <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {questions.map((question, index) => (
             <button
               key={index}

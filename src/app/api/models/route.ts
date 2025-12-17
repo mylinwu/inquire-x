@@ -37,7 +37,7 @@ export async function GET(req: Request) {
     }
 
     const data = await response.json();
-    const models: OpenRouterModel[] = data.data.map((m: Record<string, any>) => ({
+    const models: OpenRouterModel[] = data.data.map((m: OpenRouterModel) => ({
       id: m.id,
       name: m.name,
       description: m.description,

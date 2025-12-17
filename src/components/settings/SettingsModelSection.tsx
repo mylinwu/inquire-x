@@ -25,7 +25,7 @@ export function SettingsModelSection({ settings, onChange }: SettingsModelSectio
         const data = await response.json();
         setModels(data.models);
       }
-    } catch (error) {
+    } catch {
       console.error("获取模型列表失败");
     } finally {
       setIsLoadingModels(false);
