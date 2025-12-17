@@ -8,9 +8,10 @@ interface ChatListProps {
   messages: Message[];
   isStreaming?: boolean;
   onFollowUpClick?: (question: string) => void;
+  onRegenerate?: (messageId: string) => void;
 }
 
-export function ChatList({ messages, isStreaming, onFollowUpClick }: ChatListProps) {
+export function ChatList({ messages, isStreaming, onFollowUpClick, onRegenerate }: ChatListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
@@ -44,6 +45,7 @@ export function ChatList({ messages, isStreaming, onFollowUpClick }: ChatListPro
             message={message}
             isStreaming={isStreaming && index === messages.length - 1 && message.role === "assistant"}
             onFollowUpClick={onFollowUpClick}
+            onRegenerate={onRegenerate}
           />
         ))}
         <div ref={bottomRef} />

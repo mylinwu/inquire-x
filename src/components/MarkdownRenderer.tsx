@@ -4,6 +4,7 @@ import { useMemo, useEffect, useState, useRef } from "react";
 import { renderStreamingMarkdown } from "@/lib/markdown";
 import { highlightCode } from "@/lib/highlighter";
 import { useSettings } from "@/store";
+import { PHASE_LABELS } from "@/config";
 import type { ThinkingPhase } from "@/types";
 
 interface MarkdownRendererProps {
@@ -92,12 +93,6 @@ export function StreamingCursor() {
 interface ThinkingIndicatorProps {
   phase: ThinkingPhase | null;
 }
-
-const PHASE_LABELS: Record<string, string> = {
-  thinking: "思考中",
-  questioning: "自我质疑中",
-  polishing: "打磨中",
-};
 
 export function ThinkingIndicator({ phase }: ThinkingIndicatorProps) {
   if (!phase || phase === "complete") return null;

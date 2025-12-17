@@ -24,7 +24,12 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
   }, [settings, isOpen]);
 
   const handleSave = () => {
-    updateSettings(localSettings);
+    updateSettings({
+      ...localSettings,
+      recommendedQuestions: localSettings.recommendedQuestions
+        .map((q) => q.trim())
+        .filter(Boolean),
+    });
     onClose();
   };
 

@@ -45,6 +45,7 @@ export function SettingsModelSection({ settings, onChange }: SettingsModelSectio
   );
 
   return (
+    <>
     <section className="space-y-3">
       <div className="flex items-center justify-between">
         <label className="text-sm font-medium text-foreground/80">AI 模型</label>
@@ -117,5 +118,33 @@ export function SettingsModelSection({ settings, onChange }: SettingsModelSectio
         )}
       </div>
     </section>
+
+      {/* 温度设置 */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-medium text-foreground/80">模型温度</label>
+          <span className="text-xs text-muted-foreground font-mono">{settings.temperature.toFixed(1)}</span>
+        </div>
+        <div className="space-y-2">
+          <input
+            type="range"
+            min="0"
+            max="2"
+            step="0.1"
+            value={settings.temperature}
+            onChange={(e) => onChange({ ...settings, temperature: parseFloat(e.target.value) })}
+            className="w-full h-2 bg-black/5 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary"
+          />
+          <div className="flex justify-between text-[10px] text-muted-foreground">
+            <span>精确</span>
+            <span>平衡</span>
+            <span>创意</span>
+          </div>
+        </div>
+        <p className="text-[11px] text-muted-foreground leading-relaxed">
+          较高的温度会让回答更有创意和跳跃性，较低则更精确和保守
+        </p>
+      </section>
+    </>
   );
 }
