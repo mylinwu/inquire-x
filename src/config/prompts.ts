@@ -71,7 +71,7 @@ export function buildFollowUpContextPrompt(context: string): string {
 
 /** 思考阶段显示标签 */
 export const PHASE_LABELS: Record<string, string> = {
-  drafting: "撰写中",
+  drafting: "打草稿中",
   thinking: "思考中",
   questioning: "检查中",
   polishing: "正在输出...",
